@@ -18,14 +18,16 @@ dependencyManagement {
     }
 }
 
+val jvmVersion = libraries.findVersion("jvm").get().requiredVersion
+
 configure<KotlinJvmProjectExtension> {
-    jvmToolchain(21)
+    jvmToolchain(jvmVersion.toInt())
 }
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
-        jvmTarget = JvmTarget.JVM_21
+        jvmTarget = JvmTarget.fromTarget(jvmVersion)
     }
 }
 

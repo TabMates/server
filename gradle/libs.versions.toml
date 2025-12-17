@@ -1,34 +1,35 @@
 [versions]
-kotlin = "2.2.21"
-spring-boot = "4.0.0"
-spring-dependency-management = "1.1.7"
+firebase = "9.7.0"
+h2 = "2.2.224"
 jackson = "3.0.2"
 jakarta = "6.1.0"
+jvm = "21"
 jwt = "0.13.0"
-firebase = "9.7.0"
+kotlin = "2.2.21"
 kotlinx-coroutines = "1.0.0"
-h2 = "2.2.224"
-mockk = "1.13.8"
 mockito-kotlin = "5.1.0"
+mockk = "1.13.8"
+spring-boot = "4.0.0"
+spring-dependency-management = "1.1.7"
 springmockk = "4.0.2"
 
 [libraries]
 # Spring Boot Starters
+spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure" }
+spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
+spring-boot-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
-spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-amqp = { module = "org.springframework.boot:spring-boot-starter-amqp" }
-spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-boot-starter-crypto = { module = "org.springframework.security:spring-security-crypto" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
+spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-starter-websocket = { module = "org.springframework.boot:spring-boot-starter-websocket" }
-spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
-spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
-spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools" }
-spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
-spring-boot-starter-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis" }
-spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
-spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure" }
-spring-boot-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 
 # JWT
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta" }
@@ -40,13 +41,13 @@ jwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jwt" }
 jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 
 # Kotlin
+dependency-management-plugin = { module = "io.spring.gradle:dependency-management-plugin", version.ref = "spring-dependency-management" }
+kotlin-allopen = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
 kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines" }
-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlin-allopen = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin" }
 spring-boot-gradle-plugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
-dependency-management-plugin = { module = "io.spring.gradle:dependency-management-plugin", version.ref = "spring-dependency-management" }
 
 # Database
 postgresql = { module = "org.postgresql:postgresql" }
@@ -55,20 +56,20 @@ postgresql = { module = "org.postgresql:postgresql" }
 firebase-admin-sdk = { module = "com.google.firebase:firebase-admin", version.ref = "firebase" }
 
 # Test
-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+h2database = { module = "com.h2database:h2", version.ref = "h2" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
+mockito-kotlin-test = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+mockk-test = { module = "io.mockk:mockk", version.ref = "mockk" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-rabbit-test = { module = "org.springframework.amqp:spring-rabbit-test" }
 spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
 spring-security-test = { module = "org.springframework.security:spring-security-test" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-h2database = { module = "com.h2database:h2", version.ref = "h2" }
-mockk-test = { module = "io.mockk:mockk", version.ref = "mockk" }
-mockito-kotlin-test = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
 springmockk-test = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 
 [plugins]
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
-kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
