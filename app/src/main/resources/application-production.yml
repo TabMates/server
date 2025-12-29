@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+jwt:
+  expiration-minutes: 15
+
+nginx:
+  require-proxy: true
+
+tabmates:
+  email:
+    url: ${TABMATES_EMAIL_URL}
+  rate-limit:
+    ip:
+      apply-limit: true
+  web-socket:
+    allowed-origin: ${TABMATES_EMAIL_URL}

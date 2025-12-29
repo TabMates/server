@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: TabMatesServer
+
+  data:
+    redis:
+      host: "${REDIS_HOST}"
+      password: "${REDIS_PASSWORD}"
+      username: "default"
+      port: "${REDIS_PORT}"
+      connect-timeout: 5000ms
+      timeout: 2000ms
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: postgres
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 600000
+      connection-timeout: 30000
+      validation-timeout: 5000
+      pool-name: SpringBootHikariCP
+      data-source-properties:
+        prepareThreshold: 5
+        prepareStatementCacheQueries: 256
+        prepareStatementCacheSizeMiB: 5
+
+        tcpKeepAlive: true
+        socketTimeout: 30
+        connectionTimeout: 10
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    ssl:
+      enabled: true
+    listener:
+      simple:
+        acknowledge-mode: auto
+        concurrency: 3
+        max-concurrency: 10
+        prefetch: 10
+        default-requeue-rejected: true
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-interval: 10000ms
+          max-attempts: 3
+          multiplier: 2
+
+  mail:
+    host: live.smtp.mailtrap.io
+    username: smtp@mailtrap.io
+    password: ${SMPT_API_KEY}
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+    secret: ${TABMATES_JWT_SECRET}
+
+tabmates:
+  email:
+    from: account@tabmates.de
+    verification:
+      expiry-hours: 24
+    reset-password:
+      expiry-minutes: 30
+
+nginx:
+  trusted-ips:
+    - "127.0.0.1/32"     # localhost
+    - "::1"              # IPv6 localhost
+    - "172.16.0.0/12"    # docker networks
+    - "10.0.0.0/8"       # docker networks and Coolify/Traefik networks
+    - "192.168.0.0/16"   # local networks

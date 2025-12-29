@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  expiration-minutes: 1000
+
+nginx:
+  require-proxy: false
+
+tabmates:
+  email:
+    url: "http://localhost:8080/"
+  rate-limit:
+    ip:
+      apply-limit: false
+  web-socket:
+    allowed-origin: "http://localhost:8080"
