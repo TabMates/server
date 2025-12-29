@@ -10,3 +10,4 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "TabMatesServer"
 
 include("app")
+include("common")
