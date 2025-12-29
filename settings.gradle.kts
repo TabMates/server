@@ -11,3 +11,4 @@ rootProject.name = "TabMatesServer"
 
 include("app")
 include("common")
+include("user")
