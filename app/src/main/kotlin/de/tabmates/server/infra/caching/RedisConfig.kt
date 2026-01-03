@@ -17,38 +17,41 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 class RedisConfig {
-
     @Bean
-    fun cacheManager(
-        connectionFactory: LettuceConnectionFactory
-    ): RedisCacheManager {
-        val polymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
-            .allowIfSubType("java.util.") // Allow Java lists
-            .allowIfSubType("kotlin.collections.") // Kotlin collections
-            .allowIfSubType("de.tabmates.server.")
-            .build()
+    fun cacheManager(connectionFactory: LettuceConnectionFactory): RedisCacheManager {
+        val polymorphicTypeValidator =
+            BasicPolymorphicTypeValidator
+                .builder()
+                .allowIfSubType("java.util.") // Allow Java lists
+                .allowIfSubType("kotlin.collections.") // Kotlin collections
+                .allowIfSubType("de.tabmates.server.")
+                .build()
 
-        val objectMapper = JsonMapper.builder()
-            .addModule(kotlinModule())
-            .polymorphicTypeValidator(polymorphicTypeValidator)
-            .activateDefaultTyping(polymorphicTypeValidator, DefaultTyping.NON_FINAL)
-            .build()
+        val objectMapper =
+            JsonMapper
+                .builder()
+                .addModule(kotlinModule())
+                .polymorphicTypeValidator(polymorphicTypeValidator)
+                .activateDefaultTyping(polymorphicTypeValidator, DefaultTyping.NON_FINAL)
+                .build()
 
-        val cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofHours(1L))
-            .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(
-                    GenericJacksonJsonRedisSerializer(objectMapper)
+        val cacheConfig =
+            RedisCacheConfiguration
+                .defaultCacheConfig()
+                .entryTtl(Duration.ofHours(1L))
+                .serializeValuesWith(
+                    RedisSerializationContext.SerializationPair.fromSerializer(
+                        GenericJacksonJsonRedisSerializer(objectMapper),
+                    ),
                 )
-            )
 
-        return RedisCacheManager.builder(connectionFactory)
+        return RedisCacheManager
+            .builder(connectionFactory)
             .cacheDefaults(cacheConfig)
             .withCacheConfiguration(
                 "messages",
-                cacheConfig.entryTtl(Duration.ofMinutes(30))
-            )
-            .transactionAware()
+                cacheConfig.entryTtl(Duration.ofMinutes(30)),
+            ).transactionAware()
             .build()
     }
 }
