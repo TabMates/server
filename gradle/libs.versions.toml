@@ -7,6 +7,8 @@ jvm = "21"
 jwt = "0.13.0"
 kotlin = "2.2.21"
 kotlinx-coroutines = "1.0.0"
+ktlint = "14.0.1"
+ktlint-version = "1.8.0"
 mockito-kotlin = "5.1.0"
 mockk = "1.13.8"
 spring-boot = "4.0.0"
@@ -47,6 +49,7 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
 kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines" }
+ktlint-gradle-plugin = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint" }
 spring-boot-gradle-plugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
 
 # Database
@@ -71,5 +74,6 @@ springmockk-test = { module = "com.ninja-squad:springmockk", version.ref = "spri
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }

@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class TabMatesApplication
 
 fun main(args: Array<String>) {
-	runApplication<TabMatesApplication>(*args)
+    runApplication<TabMatesApplication>(*args)
 }
