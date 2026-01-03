@@ -3,6 +3,9 @@ plugins {
 }
 
 dependencies {
+    implementation(projects.common)
+    implementation(projects.user)
+
     implementation(libs.kotlin.reflect)
     implementation(libs.spring.boot.starter.security)
     implementation(libs.spring.boot.starter.actuator)
