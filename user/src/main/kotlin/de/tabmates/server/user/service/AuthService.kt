@@ -37,7 +37,6 @@ class AuthService(
     fun register(
         email: String,
         username: String,
-        displayName: String,
         password: String,
     ): User {
         val trimmedEmail = email.trim()
@@ -56,7 +55,6 @@ class AuthService(
                     RegisteredUserEntity(
                         email = trimmedEmail,
                         username = username.trim(),
-                        displayName = displayName.trim(),
                         hashedPassword = passwordEncoder.encode(password),
                     ),
                 ).toUser()
@@ -68,7 +66,7 @@ class AuthService(
                 UserEvent.Created(
                     userId = savedUser.id,
                     email = savedUser.email!!,
-                    username = savedUser.username!!,
+                    username = savedUser.username,
                     verificationToken = emailToken.token,
                 ),
         )

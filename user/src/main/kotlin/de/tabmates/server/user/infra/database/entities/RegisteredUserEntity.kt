@@ -18,7 +18,6 @@ import java.time.Instant
     schema = "user_service",
     indexes = [
         Index(name = "idx_users_email", columnList = "email"),
-        Index(name = "idx_users_username", columnList = "username"),
     ],
 )
 class RegisteredUserEntity(
@@ -27,10 +26,8 @@ class RegisteredUserEntity(
     var id: UserId? = null,
     @Column(nullable = false, unique = true)
     var email: String,
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     var username: String,
-    @Column(nullable = false, unique = true)
-    var displayName: String,
     @Column(nullable = false)
     var hashedPassword: String,
     @Column(nullable = false)

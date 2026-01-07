@@ -8,7 +8,6 @@ fun RegisteredUserEntity.toUser(): User {
     return User(
         id = id!!,
         username = username,
-        displayName = displayName,
         email = email,
         hasVerifiedEmail = hasVerifiedEmail,
         registeredUser = true,
@@ -18,10 +17,9 @@ fun RegisteredUserEntity.toUser(): User {
 fun TemporaryUserEntity.toUser(): User {
     return User(
         id = id!!,
-        username = null,
-        displayName = displayName,
+        username = username,
         email = null,
-        hasVerifiedEmail = hasVerifiedEmail,
+        hasVerifiedEmail = false,
         registeredUser = false,
     )
 }

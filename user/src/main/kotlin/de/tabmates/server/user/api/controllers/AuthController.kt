@@ -46,7 +46,6 @@ class AuthController(
             .register(
                 email = body.email,
                 username = body.username,
-                displayName = body.displayName,
                 password = body.password,
             ).toUserDto()
     }
