@@ -14,13 +14,13 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name = "users_temporary",
+    name = "users_anonymous",
     schema = "user_service",
     indexes = [
         Index(name = "idx_users_id", columnList = "id"),
     ],
 )
-class TemporaryUserEntity(
+class AnonymousUserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UserId? = null,

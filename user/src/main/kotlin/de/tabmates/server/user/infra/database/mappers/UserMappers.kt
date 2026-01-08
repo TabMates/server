@@ -1,8 +1,9 @@
 package de.tabmates.server.user.infra.database.mappers
 
 import de.tabmates.server.user.domain.model.User
+import de.tabmates.server.user.domain.model.UserType
+import de.tabmates.server.user.infra.database.entities.AnonymousUserEntity
 import de.tabmates.server.user.infra.database.entities.RegisteredUserEntity
-import de.tabmates.server.user.infra.database.entities.TemporaryUserEntity
 
 fun RegisteredUserEntity.toUser(): User {
     return User(
@@ -10,16 +11,16 @@ fun RegisteredUserEntity.toUser(): User {
         username = username,
         email = email,
         hasVerifiedEmail = hasVerifiedEmail,
-        registeredUser = true,
+        userType = UserType.REGISTERED,
     )
 }
 
-fun TemporaryUserEntity.toUser(): User {
+fun AnonymousUserEntity.toUser(): User {
     return User(
         id = id!!,
         username = username,
         email = null,
         hasVerifiedEmail = false,
-        registeredUser = false,
+        userType = UserType.ANONYMOUS,
     )
 }

@@ -11,9 +11,11 @@ import de.tabmates.server.user.domain.exception.UserAlreadyExistsException
 import de.tabmates.server.user.domain.exception.UserNotFoundException
 import de.tabmates.server.user.domain.model.AuthenticatedUser
 import de.tabmates.server.user.domain.model.User
+import de.tabmates.server.user.infra.database.entities.AnonymousUserEntity
 import de.tabmates.server.user.infra.database.entities.RefreshTokenEntity
 import de.tabmates.server.user.infra.database.entities.RegisteredUserEntity
 import de.tabmates.server.user.infra.database.mappers.toUser
+import de.tabmates.server.user.infra.database.repositories.AnonymousUserRepository
 import de.tabmates.server.user.infra.database.repositories.RefreshTokenRepository
 import de.tabmates.server.user.infra.database.repositories.RegisteredUserRepository
 import de.tabmates.server.user.infra.security.PasswordEncoder
@@ -27,6 +29,7 @@ import java.util.Base64
 @Service
 class AuthService(
     private val registeredUserRepository: RegisteredUserRepository,
+    private val anonymousUserRepository: AnonymousUserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val refreshTokenRepository: RefreshTokenRepository,
@@ -74,6 +77,19 @@ class AuthService(
         return savedUser
     }
 
+    fun registerAnonymous(
+        username: String,
+        password: String,
+    ): User {
+        return anonymousUserRepository
+            .saveAndFlush(
+                AnonymousUserEntity(
+                    username = username.trim(),
+                    hashedPassword = passwordEncoder.encode(password),
+                ),
+            ).toUser()
+    }
+
     fun login(
         email: String,
         password: String,
@@ -109,6 +125,37 @@ class AuthService(
         } ?: throw UserNotFoundException()
     }
 
+    fun loginAnonymous(
+        userId: UserId,
+        password: String,
+    ): AuthenticatedUser {
+        val user =
+            anonymousUserRepository.findByIdOrNull(userId)
+                ?: throw InvalidCredentialsException()
+
+        val passwordMatches =
+            passwordEncoder.matches(
+                rawPassword = password,
+                hashedPassword = user.hashedPassword,
+            )
+        if (!passwordMatches) {
+            throw InvalidCredentialsException()
+        }
+
+        return user.id?.let { userId ->
+            val accessToken = jwtService.generateAccessToken(userId)
+            val refreshToken = jwtService.generateRefreshToken(userId)
+
+            storeRefreshToken(userId, refreshToken)
+
+            AuthenticatedUser(
+                user = user.toUser(),
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+            )
+        } ?: throw UserNotFoundException()
+    }
+
     @Transactional
     fun refresh(refreshToken: String): AuthenticatedUser {
         if (!jwtService.validateRefreshToken(refreshToken)) {
@@ -117,32 +164,31 @@ class AuthService(
 
         val userId = jwtService.getUserIdFromToken(refreshToken)
         val user =
-            registeredUserRepository.findByIdOrNull(userId)
+            registeredUserRepository.findByIdOrNull(userId)?.toUser()
+                ?: anonymousUserRepository.findByIdOrNull(userId)?.toUser()
                 ?: throw UserNotFoundException()
         val hashed = hashToken(refreshToken)
 
-        return user.id?.let { userId ->
-            refreshTokenRepository.findByUserIdAndHashedToken(
-                userId = userId,
-                hashedToken = hashed,
-            ) ?: throw InvalidTokenException(message = "Invalid refresh token")
+        refreshTokenRepository.findByUserIdAndHashedToken(
+            userId = userId,
+            hashedToken = hashed,
+        ) ?: throw InvalidTokenException(message = "Invalid refresh token")
 
-            refreshTokenRepository.deleteByUserIdAndHashedToken(
-                userId = userId,
-                hashedToken = hashed,
-            )
+        refreshTokenRepository.deleteByUserIdAndHashedToken(
+            userId = userId,
+            hashedToken = hashed,
+        )
 
-            val newAccessToken = jwtService.generateAccessToken(userId)
-            val newRefreshToken = jwtService.generateRefreshToken(userId)
+        val newAccessToken = jwtService.generateAccessToken(userId)
+        val newRefreshToken = jwtService.generateRefreshToken(userId)
 
-            storeRefreshToken(userId, newRefreshToken)
+        storeRefreshToken(userId, newRefreshToken)
 
-            AuthenticatedUser(
-                user = user.toUser(),
-                accessToken = newAccessToken,
-                refreshToken = newRefreshToken,
-            )
-        } ?: throw UserNotFoundException()
+        return AuthenticatedUser(
+            user = user,
+            accessToken = newAccessToken,
+            refreshToken = newRefreshToken,
+        )
     }
 
     @Transactional

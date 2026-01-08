@@ -5,8 +5,10 @@ import de.tabmates.server.user.api.config.IpRateLimit
 import de.tabmates.server.user.api.dto.AuthenticatedUserDto
 import de.tabmates.server.user.api.dto.ChangePasswordRequest
 import de.tabmates.server.user.api.dto.EmailRequest
+import de.tabmates.server.user.api.dto.LoginAnonymousRequest
 import de.tabmates.server.user.api.dto.LoginRequest
 import de.tabmates.server.user.api.dto.RefreshRequest
+import de.tabmates.server.user.api.dto.RegisterAnonymousRequest
 import de.tabmates.server.user.api.dto.RegisterRequest
 import de.tabmates.server.user.api.dto.ResetPasswordRequest
 import de.tabmates.server.user.api.dto.UserDto
@@ -50,6 +52,22 @@ class AuthController(
             ).toUserDto()
     }
 
+    @PostMapping("/register-anonymous")
+    @IpRateLimit(
+        requests = 10,
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+    )
+    fun registerAnonymous(
+        @Valid @RequestBody body: RegisterAnonymousRequest,
+    ): UserDto {
+        return authService
+            .registerAnonymous(
+                username = body.username,
+                password = body.password,
+            ).toUserDto()
+    }
+
     @PostMapping("/login")
     @IpRateLimit(
         requests = 10,
@@ -62,6 +80,22 @@ class AuthController(
         return authService
             .login(
                 email = body.email,
+                password = body.password,
+            ).toAuthenticatedUserDto()
+    }
+
+    @PostMapping("/login-anonymous")
+    @IpRateLimit(
+        requests = 10,
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+    )
+    fun loginAnonymous(
+        @RequestBody body: LoginAnonymousRequest,
+    ): AuthenticatedUserDto {
+        return authService
+            .loginAnonymous(
+                userId = body.userId,
                 password = body.password,
             ).toAuthenticatedUserDto()
     }
