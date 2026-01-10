@@ -2,6 +2,10 @@ spring:
   application:
     name: TabMatesServer
 
+  security:
+    user:
+      password: none  # Disable default user generation - using JWT authentication
+
   data:
     redis:
       host: "${REDIS_HOST}"
