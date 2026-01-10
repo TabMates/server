@@ -18,6 +18,7 @@ RUN chmod +x gradlew
 COPY app/build.gradle.kts app/
 COPY common/build.gradle.kts common/
 COPY user/build.gradle.kts user/
+ COPY notification/build.gradle.kts notification/
 
 # Download dependencies (this layer will be cached unless dependencies change)
 RUN ./gradlew dependencies --no-daemon || return 0
@@ -27,6 +28,7 @@ RUN ./gradlew dependencies --no-daemon || return 0
 COPY app/src app/src
 COPY common/src common/src
 COPY user/src user/src
+COPY notification/src notification/src
 
 # Build the application
 RUN ./gradlew :app:bootJar --no-daemon -x test
