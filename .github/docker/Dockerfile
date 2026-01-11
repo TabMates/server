@@ -17,8 +17,9 @@ RUN chmod +x gradlew
 # Copy all module build files first for better caching
 COPY app/build.gradle.kts app/
 COPY common/build.gradle.kts common/
+COPY notification/build.gradle.kts notification/
+COPY tabgroup/build.gradle.kts tabgroup/
 COPY user/build.gradle.kts user/
- COPY notification/build.gradle.kts notification/
 
 # Download dependencies (this layer will be cached unless dependencies change)
 RUN ./gradlew dependencies --no-daemon || return 0
@@ -27,8 +28,9 @@ RUN ./gradlew dependencies --no-daemon || return 0
 # We copy the entire module structure to handle this
 COPY app/src app/src
 COPY common/src common/src
-COPY user/src user/src
 COPY notification/src notification/src
+COPY tabgroup/src tabgroup/src
+COPY user/src user/src
 
 # Build the application
 RUN ./gradlew :app:bootJar --no-daemon -x test

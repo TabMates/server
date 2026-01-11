@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation(projects.common)
     implementation(projects.notification)
+    implementation(projects.tabgroup)
     implementation(projects.user)
 
     implementation(libs.kotlin.reflect)
