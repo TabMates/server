@@ -1,8 +1,8 @@
 package de.tabmates.server.user.api.dto
 
-import jakarta.validation.constraints.Email
+import de.tabmates.server.user.api.util.ValidEmail
 
 data class EmailRequest(
-    @field:Email
+    @field:ValidEmail
     val email: String,
 )
