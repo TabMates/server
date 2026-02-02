@@ -1,4 +1,4 @@
-package de.tabmates.server.groups.infra.database.entries
+package de.tabmates.server.groups.infra.database.entities
 
 import de.tabmates.server.common.domain.type.UserId
 import jakarta.persistence.Column

@@ -1,4 +1,4 @@
-package de.tabmates.server.groups.infra.database.entries
+package de.tabmates.server.groups.infra.database.entities
 
 import de.tabmates.server.common.domain.type.GroupId
 import jakarta.persistence.Entity
@@ -13,7 +13,6 @@ import jakarta.persistence.ManyToMany
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
 
 @Entity

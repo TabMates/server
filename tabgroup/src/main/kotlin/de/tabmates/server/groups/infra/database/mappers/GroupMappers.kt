@@ -4,10 +4,10 @@ import de.tabmates.server.groups.domain.model.Group
 import de.tabmates.server.groups.domain.model.GroupParticipant
 import de.tabmates.server.groups.domain.model.TabEntry
 import de.tabmates.server.groups.domain.model.UserType
-import de.tabmates.server.groups.infra.database.entries.GroupEntity
-import de.tabmates.server.groups.infra.database.entries.GroupParticipantEntity
-import de.tabmates.server.groups.infra.database.entries.TabEntryEntity
-import de.tabmates.server.groups.infra.database.entries.UserTypeDatabase
+import de.tabmates.server.groups.infra.database.entities.GroupEntity
+import de.tabmates.server.groups.infra.database.entities.GroupParticipantEntity
+import de.tabmates.server.groups.infra.database.entities.TabEntryEntity
+import de.tabmates.server.groups.infra.database.entities.UserTypeDatabase
 
 fun GroupEntity.toGroup(lastTabEntry: TabEntry? = null): Group {
     return Group(
