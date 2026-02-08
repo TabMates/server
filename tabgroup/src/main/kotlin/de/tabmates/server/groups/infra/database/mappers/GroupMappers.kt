@@ -42,7 +42,7 @@ fun GroupParticipant.toGroupParticipantEntity(): GroupParticipantEntity {
         userId = userId,
         username = username,
         email = email,
-        userType = userType.toUserType(),
+        userType = userType.toUserTypeDatabase(),
     )
 }
 
@@ -110,7 +110,7 @@ fun UserTypeDatabase.toUserType(): UserType {
     }
 }
 
-fun UserType.toUserType(): UserTypeDatabase {
+fun UserType.toUserTypeDatabase(): UserTypeDatabase {
     return when (this) {
         UserType.REGISTERED -> UserTypeDatabase.REGISTERED
         UserType.ANONYMOUS -> UserTypeDatabase.ANONYMOUS
