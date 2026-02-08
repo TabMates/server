@@ -6,15 +6,25 @@ import de.tabmates.server.common.domain.type.UserId
 import de.tabmates.server.groups.domain.exception.GroupNotFoundException
 import de.tabmates.server.groups.domain.exception.GroupParticipantNotFoundException
 import de.tabmates.server.groups.domain.exception.TabEntryNotFoundException
+import de.tabmates.server.groups.domain.model.ChangeType
 import de.tabmates.server.groups.domain.model.TabEntry
+import de.tabmates.server.groups.domain.model.TabEntryHistory
 import de.tabmates.server.groups.domain.model.TabEntrySplit
 import de.tabmates.server.groups.infra.database.entities.TabEntryEntity
+import de.tabmates.server.groups.infra.database.entities.TabEntryHistoryEntity
 import de.tabmates.server.groups.infra.database.entities.TabEntrySplitEntity
+import de.tabmates.server.groups.infra.database.entities.types.ChangeTypeDatabase
+import de.tabmates.server.groups.infra.database.entities.types.SplitType
+import de.tabmates.server.groups.infra.database.mappers.toChangeTypeDatabase
+import de.tabmates.server.groups.infra.database.mappers.toGroupParticipant
+import de.tabmates.server.groups.infra.database.mappers.toSplit
 import de.tabmates.server.groups.infra.database.mappers.toSplitType
 import de.tabmates.server.groups.infra.database.mappers.toTabEntry
+import de.tabmates.server.groups.infra.database.mappers.toTabEntryHistory
 import de.tabmates.server.groups.infra.database.mappers.toValue
 import de.tabmates.server.groups.infra.database.repositories.GroupParticipantRepository
 import de.tabmates.server.groups.infra.database.repositories.GroupRepository
+import de.tabmates.server.groups.infra.database.repositories.TabEntryHistoryRepository
 import de.tabmates.server.groups.infra.database.repositories.TabEntryRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
@@ -29,6 +39,7 @@ class TabEntryService(
     private val groupRepository: GroupRepository,
     private val groupParticipantRepository: GroupParticipantRepository,
     private val tabEntryRepository: TabEntryRepository,
+    private val tabEntryHistoryRepository: TabEntryHistoryRepository,
 ) {
     @Transactional
     fun addTabEntry(
@@ -88,7 +99,11 @@ class TabEntryService(
                 lastModifiedBy = creator,
             )
 
-        return tabEntryRepository.save(tabEntry).toTabEntry()
+        val savedTabEntry = tabEntryRepository.save(tabEntry)
+
+        saveHistory(savedTabEntry, ChangeType.CREATED, creatorId)
+
+        return savedTabEntry.toTabEntry()
     }
 
     @Transactional
@@ -157,7 +172,11 @@ class TabEntryService(
         existingTabEntry.lastModifiedByUserId = modifiedByUserId
         existingTabEntry.lastModifiedBy = modifiedByUser
 
-        return tabEntryRepository.save(existingTabEntry).toTabEntry()
+        val savedTabEntry = tabEntryRepository.save(existingTabEntry)
+
+        saveHistory(savedTabEntry, ChangeType.UPDATED, modifiedByUserId)
+
+        return savedTabEntry.toTabEntry()
     }
 
     @Transactional
@@ -183,6 +202,138 @@ class TabEntryService(
         existingTabEntry.lastModifiedByUserId = deletedByUserId
         existingTabEntry.lastModifiedBy = deletedByUser
 
-        tabEntryRepository.save(existingTabEntry)
+        val savedTabEntry = tabEntryRepository.save(existingTabEntry)
+
+        saveHistory(savedTabEntry, ChangeType.DELETED, deletedByUserId)
+    }
+
+    @Deprecated(message = "This was just the first version, the new method should be pageable.")
+    fun getTabEntryHistory(tabEntryId: TabEntryId): List<TabEntryHistory> {
+        tabEntryRepository.findByIdOrNull(tabEntryId)
+            ?: throw TabEntryNotFoundException()
+
+        val historyEntities =
+            tabEntryHistoryRepository.findByTabEntryId(tabEntryId)
+
+        return historyEntities.map { historyEntity ->
+            val changedByParticipant =
+                groupParticipantRepository
+                    .findByIdOrNull(historyEntity.changedByUserId)
+                    ?.toGroupParticipant()
+                    ?: throw GroupParticipantNotFoundException(historyEntity.changedByUserId)
+
+            val creator =
+                groupParticipantRepository
+                    .findByIdOrNull(historyEntity.creatorId)
+                    ?.toGroupParticipant()
+                    ?: throw GroupParticipantNotFoundException(historyEntity.creatorId)
+
+            val paidBy =
+                groupParticipantRepository
+                    .findByIdOrNull(historyEntity.paidByUserId)
+                    ?.toGroupParticipant()
+                    ?: throw GroupParticipantNotFoundException(historyEntity.paidByUserId)
+
+            val splitSnapshots = parseSplitsSnapshot(historyEntity.splitsSnapshot)
+            val splits =
+                splitSnapshots.map { snapshot ->
+                    val participant =
+                        groupParticipantRepository
+                            .findByIdOrNull(UUID.fromString(snapshot.participantId))
+                            ?.toGroupParticipant()
+
+                    TabEntrySplit(
+                        id = UUID.randomUUID(), // History splits don't have persistent IDs
+                        participantId = UUID.fromString(snapshot.participantId),
+                        participant = participant,
+                        split = SplitType.valueOf(snapshot.splitType).toSplit(snapshot.value),
+                        resolvedAmount = snapshot.resolvedAmount,
+                    )
+                }
+
+            val deletedBy =
+                if (historyEntity.changeType == ChangeTypeDatabase.DELETED) {
+                    changedByParticipant
+                } else {
+                    null
+                }
+
+            historyEntity.toTabEntryHistory(
+                changedByParticipant = changedByParticipant,
+                creator = creator,
+                paidBy = paidBy,
+                splits = splits,
+                deletedBy = deletedBy,
+            )
+        }
+    }
+
+    private fun saveHistory(
+        tabEntry: TabEntryEntity,
+        changeType: ChangeType,
+        changedByUserId: UserId,
+    ) {
+        val historyEntity =
+            TabEntryHistoryEntity(
+                tabEntryId = tabEntry.id!!,
+                groupId = tabEntry.groupId,
+                version = tabEntry.version,
+                changeType = changeType.toChangeTypeDatabase(),
+                changedAt = Instant.now(),
+                changedByUserId = changedByUserId,
+                title = tabEntry.title,
+                description = tabEntry.description,
+                amount = tabEntry.amount,
+                currency = tabEntry.currency,
+                paidByUserId = tabEntry.paidByUserId,
+                creatorId = tabEntry.creatorId,
+                originalCreatedAt = tabEntry.createdAt,
+                splitsSnapshot = tabEntry.splits.toSplitsSnapshotJson(),
+            )
+
+        tabEntryHistoryRepository.save(historyEntity)
+    }
+
+    private fun parseSplitsSnapshot(json: String): List<SplitSnapshotData> {
+        if (json.isBlank() || json == "[]") return emptyList()
+
+        val objectMapper =
+            tools.jackson.databind.json.JsonMapper
+                .builder()
+                .addModule(
+                    tools.jackson.module.kotlin
+                        .kotlinModule(),
+                ).build()
+        return objectMapper.readValue(
+            json,
+            objectMapper.typeFactory.constructCollectionType(List::class.java, SplitSnapshotData::class.java),
+        )
+    }
+
+    private fun List<TabEntrySplitEntity>.toSplitsSnapshotJson(): String {
+        val snapshots =
+            this.map { split ->
+                mapOf(
+                    "participantId" to split.participantId.toString(),
+                    "splitType" to split.splitType.name,
+                    "value" to split.value,
+                    "resolvedAmount" to split.resolvedAmount,
+                )
+            }
+        val objectMapper =
+            tools.jackson.databind.json.JsonMapper
+                .builder()
+                .addModule(
+                    tools.jackson.module.kotlin
+                        .kotlinModule(),
+                ).build()
+        return objectMapper.writeValueAsString(snapshots)
     }
 }
+
+private data class SplitSnapshotData(
+    val participantId: String,
+    val splitType: String,
+    val value: BigDecimal,
+    val resolvedAmount: BigDecimal,
+)

@@ -1,16 +1,20 @@
 package de.tabmates.server.groups.infra.database.mappers
 
+import de.tabmates.server.groups.domain.model.ChangeType
 import de.tabmates.server.groups.domain.model.Group
 import de.tabmates.server.groups.domain.model.GroupParticipant
 import de.tabmates.server.groups.domain.model.Split
 import de.tabmates.server.groups.domain.model.TabEntry
+import de.tabmates.server.groups.domain.model.TabEntryHistory
 import de.tabmates.server.groups.domain.model.TabEntrySplit
 import de.tabmates.server.groups.domain.model.UserType
 import de.tabmates.server.groups.infra.database.entities.GroupEntity
 import de.tabmates.server.groups.infra.database.entities.GroupParticipantEntity
 import de.tabmates.server.groups.infra.database.entities.TabEntryEntity
+import de.tabmates.server.groups.infra.database.entities.TabEntryHistoryEntity
 import de.tabmates.server.groups.infra.database.entities.TabEntrySplitEntity
 import de.tabmates.server.groups.infra.database.entities.UserTypeDatabase
+import de.tabmates.server.groups.infra.database.entities.types.ChangeTypeDatabase
 import de.tabmates.server.groups.infra.database.entities.types.SplitType
 import java.math.BigDecimal
 
@@ -114,5 +118,54 @@ fun UserType.toUserTypeDatabase(): UserTypeDatabase {
     return when (this) {
         UserType.REGISTERED -> UserTypeDatabase.REGISTERED
         UserType.ANONYMOUS -> UserTypeDatabase.ANONYMOUS
+    }
+}
+
+fun TabEntryHistoryEntity.toTabEntryHistory(
+    changedByParticipant: GroupParticipant,
+    creator: GroupParticipant,
+    paidBy: GroupParticipant,
+    splits: List<TabEntrySplit>,
+    deletedBy: GroupParticipant? = null,
+): TabEntryHistory {
+    return TabEntryHistory(
+        historyId = id!!,
+        changeType = changeType.toChangeType(),
+        changedAt = changedAt,
+        changedBy = changedByParticipant,
+        tabEntry =
+            TabEntry(
+                id = tabEntryId,
+                groupId = groupId,
+                creator = creator,
+                paidBy = paidBy,
+                title = title,
+                description = description,
+                amount = amount,
+                currency = currency,
+                splits = splits,
+                createdAt = originalCreatedAt,
+                lastModifiedAt = changedAt,
+                lastModifiedBy = changedByParticipant,
+                version = version,
+                deletedAt = if (changeType == ChangeTypeDatabase.DELETED) changedAt else null,
+                deletedBy = deletedBy,
+            ),
+    )
+}
+
+fun ChangeTypeDatabase.toChangeType(): ChangeType {
+    return when (this) {
+        ChangeTypeDatabase.CREATED -> ChangeType.CREATED
+        ChangeTypeDatabase.UPDATED -> ChangeType.UPDATED
+        ChangeTypeDatabase.DELETED -> ChangeType.DELETED
+    }
+}
+
+fun ChangeType.toChangeTypeDatabase(): ChangeTypeDatabase {
+    return when (this) {
+        ChangeType.CREATED -> ChangeTypeDatabase.CREATED
+        ChangeType.UPDATED -> ChangeTypeDatabase.UPDATED
+        ChangeType.DELETED -> ChangeTypeDatabase.DELETED
     }
 }

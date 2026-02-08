@@ -23,9 +23,19 @@ interface TabEntryHistoryRepository : JpaRepository<TabEntryHistoryEntity, TabEn
         ORDER BY te.changedAt DESC
     """,
     )
-    fun findByTabEntryHistoryIdBefore(
+    fun findByGroupIdBefore(
         groupId: GroupId,
         before: Instant,
         pageable: Pageable,
     ): Slice<TabEntryHistoryEntity>
+
+    @Query(
+        """
+        SELECT te
+        FROM TabEntryHistoryEntity te
+        WHERE te.tabEntryId = :tabEntryId
+        ORDER BY te.version DESC
+    """,
+    )
+    fun findByTabEntryId(tabEntryId: TabEntryId): List<TabEntryHistoryEntity>
 }

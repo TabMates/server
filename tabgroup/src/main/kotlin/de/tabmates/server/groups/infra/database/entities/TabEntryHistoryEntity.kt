@@ -4,7 +4,7 @@ import de.tabmates.server.common.domain.type.GroupId
 import de.tabmates.server.common.domain.type.TabEntryHistoryId
 import de.tabmates.server.common.domain.type.TabEntryId
 import de.tabmates.server.common.domain.type.UserId
-import de.tabmates.server.groups.infra.database.entities.types.ChangeType
+import de.tabmates.server.groups.infra.database.entities.types.ChangeTypeDatabase
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -76,7 +76,7 @@ class TabEntryHistoryEntity(
      */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var changeType: ChangeType,
+    var changeType: ChangeTypeDatabase,
     /**
      * When this change was made.
      */
