@@ -3,6 +3,8 @@ package de.tabmates.server.groups.service
 import de.tabmates.server.common.domain.exception.ForbiddenException
 import de.tabmates.server.common.domain.type.GroupId
 import de.tabmates.server.common.domain.type.UserId
+import de.tabmates.server.groups.api.dto.TabEntryDto
+import de.tabmates.server.groups.api.mappers.toTabEntryDto
 import de.tabmates.server.groups.domain.event.GroupCreatedEvent
 import de.tabmates.server.groups.domain.event.GroupDeletedEvent
 import de.tabmates.server.groups.domain.event.GroupParticipantJoinedEvent
@@ -18,9 +20,12 @@ import de.tabmates.server.groups.infra.database.repositories.GroupParticipantRep
 import de.tabmates.server.groups.infra.database.repositories.GroupRepository
 import de.tabmates.server.groups.infra.database.repositories.TabEntryRepository
 import jakarta.transaction.Transactional
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class GroupService(
@@ -155,6 +160,26 @@ class GroupService(
                 userId = userId,
             ),
         )
+    }
+
+    @Cacheable(
+        value = ["tabEntries"],
+        key = "#groupId",
+        condition = "#before == null && #pageSize <= 50",
+        sync = true,
+    )
+    fun getTabEntries(
+        groupId: GroupId,
+        before: Instant?,
+        pageSize: Int,
+    ): List<TabEntryDto> {
+        return tabEntryRepository
+            .findByTabEntryIdBefore(
+                groupId = groupId,
+                before = before ?: Instant.now(),
+                pageable = PageRequest.of(0, pageSize),
+            ).content
+            .map { it.toTabEntry().toTabEntryDto() }
     }
 
     private fun lastTabEntryForGroup(groupId: GroupId): TabEntry? {
