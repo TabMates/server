@@ -69,7 +69,7 @@ sealed class Split {
  * Represents a single participant's share in an expense split.
  */
 data class TabEntrySplit(
-    val id: TabEntrySplitId,
+    val id: TabEntrySplitId? = null,
     val participantId: UserId,
     val participant: GroupParticipant?,
     val split: Split,

@@ -61,7 +61,7 @@ fun UserType.toUserTypeDto(): UserTypeDto {
 
 fun TabEntrySplit.toTabEntrySplitDto(): TabEntrySplitDto {
     return TabEntrySplitDto(
-        id = id,
+        id = id!!,
         participantId = participantId,
         participant = participant?.toGroupParticipantDto(),
         split = split.toSplitDto(),
@@ -75,5 +75,14 @@ fun Split.toSplitDto(): SplitDto {
         is Split.ExactAmount -> SplitDto.ExactAmount(amount)
         is Split.Percentage -> SplitDto.Percentage(percentage)
         is Split.Shares -> SplitDto.Shares(shares)
+    }
+}
+
+fun SplitDto.toSplit(): Split {
+    return when (this) {
+        is SplitDto.Equal -> Split.Equal
+        is SplitDto.ExactAmount -> Split.ExactAmount(this.amount)
+        is SplitDto.Percentage -> Split.Percentage(this.percentage)
+        is SplitDto.Shares -> Split.Shares(this.shares)
     }
 }

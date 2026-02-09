@@ -3,6 +3,7 @@ package de.tabmates.server.groups.service
 import de.tabmates.server.common.domain.type.GroupId
 import de.tabmates.server.common.domain.type.TabEntryId
 import de.tabmates.server.common.domain.type.UserId
+import de.tabmates.server.groups.domain.event.TabEntryDeletedEvent
 import de.tabmates.server.groups.domain.exception.GroupNotFoundException
 import de.tabmates.server.groups.domain.exception.GroupParticipantNotFoundException
 import de.tabmates.server.groups.domain.exception.TabEntryNotFoundException
@@ -27,6 +28,7 @@ import de.tabmates.server.groups.infra.database.repositories.GroupRepository
 import de.tabmates.server.groups.infra.database.repositories.TabEntryHistoryRepository
 import de.tabmates.server.groups.infra.database.repositories.TabEntryRepository
 import jakarta.transaction.Transactional
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -40,6 +42,7 @@ class TabEntryService(
     private val groupParticipantRepository: GroupParticipantRepository,
     private val tabEntryRepository: TabEntryRepository,
     private val tabEntryHistoryRepository: TabEntryHistoryRepository,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun addTabEntry(
@@ -203,6 +206,13 @@ class TabEntryService(
         existingTabEntry.lastModifiedBy = deletedByUser
 
         val savedTabEntry = tabEntryRepository.save(existingTabEntry)
+
+        applicationEventPublisher.publishEvent(
+            TabEntryDeletedEvent(
+                groupId = savedTabEntry.groupId,
+                tabEntryId = savedTabEntry.id!!,
+            ),
+        )
 
         saveHistory(savedTabEntry, ChangeType.DELETED, deletedByUserId)
     }
