@@ -79,11 +79,29 @@ class RabbitMqConfig {
         )
 
     @Bean
+    fun tabGroupUserEventsQueue() =
+        Queue(
+            MessageQueues.TABGROUP_USER_EVENTS,
+            true,
+        )
+
+    @Bean
     fun notificationUserEventsQueue() =
         Queue(
             MessageQueues.NOTIFICATION_USER_EVENTS,
             true,
         )
+
+    @Bean
+    fun tabGroupUserEventsBinding(
+        tabGroupUserEventsQueue: Queue,
+        userExchange: TopicExchange,
+    ): Binding {
+        return BindingBuilder
+            .bind(tabGroupUserEventsQueue)
+            .to(userExchange)
+            .with("user.*")
+    }
 
     @Bean
     fun notificationUserEventsBinding(
