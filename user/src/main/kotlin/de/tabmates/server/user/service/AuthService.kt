@@ -77,17 +77,29 @@ class AuthService(
         return savedUser
     }
 
+    @Transactional
     fun registerAnonymous(
         username: String,
         password: String,
     ): User {
-        return anonymousUserRepository
-            .saveAndFlush(
-                AnonymousUserEntity(
-                    username = username.trim(),
-                    hashedPassword = passwordEncoder.encode(password),
+        val savedUser =
+            anonymousUserRepository
+                .saveAndFlush(
+                    AnonymousUserEntity(
+                        username = username.trim(),
+                        hashedPassword = passwordEncoder.encode(password),
+                    ),
+                ).toUser()
+
+        eventPublisher.publish(
+            event =
+                UserEvent.AnonymousUserCreated(
+                    userId = savedUser.id,
+                    username = savedUser.username,
                 ),
-            ).toUser()
+        )
+
+        return savedUser
     }
 
     fun login(

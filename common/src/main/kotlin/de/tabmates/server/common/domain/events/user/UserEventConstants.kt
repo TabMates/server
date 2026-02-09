@@ -7,4 +7,5 @@ object UserEventConstants {
     const val USER_VERIFIED = "user.verified"
     const val USER_REQUEST_RESEND_VERIFICATION = "user.request_resend_verification"
     const val USER_REQUEST_RESET_PASSWORD = "user.request_reset_password"
+    const val USER_ANONYMOUS_CREATED = "user.anonymous_created"
 }

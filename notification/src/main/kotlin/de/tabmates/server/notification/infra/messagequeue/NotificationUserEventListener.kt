@@ -44,7 +44,9 @@ class NotificationUserEventListener(
                 )
             }
 
-            is UserEvent.Verified -> {
+            is UserEvent.Verified,
+            is UserEvent.AnonymousUserCreated,
+            -> {
                 Unit
             }
         }

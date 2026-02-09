@@ -41,4 +41,10 @@ sealed class UserEvent(
         val expiresInMinutes: Long,
         override val eventKey: String = UserEventConstants.USER_REQUEST_RESET_PASSWORD,
     ) : UserEvent(), TabMatesEvent
+
+    data class AnonymousUserCreated(
+        val userId: UserId,
+        val username: String,
+        override val eventKey: String = UserEventConstants.USER_ANONYMOUS_CREATED,
+    ) : UserEvent(), TabMatesEvent
 }
