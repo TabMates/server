@@ -1,19 +1,19 @@
 [versions]
 firebase = "9.7.0"
-h2 = "2.2.224"
-jackson = "3.0.2"
+h2 = "2.4.240"
+jackson = "3.0.4"
 jakarta = "6.1.0"
 jvm = "21"
 jwt = "0.13.0"
-kotlin = "2.2.21"
-kotlinx-coroutines = "1.0.0"
+kotlin = "2.3.10"
+kotlinx-coroutines = "1.10.2"
 ktlint = "14.0.1"
 ktlint-version = "1.8.0"
-mockito-kotlin = "5.1.0"
-mockk = "1.13.8"
-spring-boot = "4.0.0"
+mockito-kotlin = "6.2.3"
+mockk = "1.14.9"
+spring-boot = "4.0.2"
 spring-dependency-management = "1.1.7"
-springmockk = "4.0.2"
+springmockk = "5.0.1"
 
 [libraries]
 # Spring Boot Starters
