@@ -1,5 +1,5 @@
 [versions]
-firebase = "9.7.0"
+firebase = "9.7.1"
 h2 = "2.4.240"
 jackson = "3.0.4"
 jakarta = "6.1.0"
