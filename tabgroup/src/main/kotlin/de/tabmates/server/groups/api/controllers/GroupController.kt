@@ -2,6 +2,7 @@ package de.tabmates.server.groups.api.controllers
 
 import de.tabmates.server.common.api.util.requestedUserId
 import de.tabmates.server.common.domain.type.GroupId
+import de.tabmates.server.groups.api.dto.AddNewParticipantToGroupDto
 import de.tabmates.server.groups.api.dto.AddParticipantToGroupDto
 import de.tabmates.server.groups.api.dto.CreateGroupRequestDto
 import de.tabmates.server.groups.api.dto.GroupDto
@@ -79,6 +80,19 @@ class GroupController(
                 requestedUserId = requestedUserId,
                 groupId = groupId,
                 userIds = body.userIds.toSet(),
+            ).toGroupDto()
+    }
+
+    @PostMapping("/{groupId}/add-new")
+    fun addNewGroupParticipant(
+        @PathVariable("groupId") groupId: GroupId,
+        @Valid @RequestBody body: AddNewParticipantToGroupDto,
+    ): GroupDto {
+        return groupService
+            .addNewParticipantsToGroup(
+                requestedUserId = requestedUserId,
+                groupId = groupId,
+                usernames = body.usernames.toSet(),
             ).toGroupDto()
     }
 

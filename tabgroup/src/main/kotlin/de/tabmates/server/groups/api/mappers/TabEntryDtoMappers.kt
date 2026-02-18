@@ -56,6 +56,7 @@ fun UserType.toUserTypeDto(): UserTypeDto {
     return when (this) {
         UserType.REGISTERED -> UserTypeDto.REGISTERED
         UserType.ANONYMOUS -> UserTypeDto.ANONYMOUS
+        UserType.PLACEHOLDER -> UserTypeDto.PLACEHOLDER
     }
 }
 

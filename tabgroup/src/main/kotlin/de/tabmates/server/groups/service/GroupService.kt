@@ -14,6 +14,8 @@ import de.tabmates.server.groups.domain.exception.GroupParticipantNotFoundExcept
 import de.tabmates.server.groups.domain.model.Group
 import de.tabmates.server.groups.domain.model.TabEntry
 import de.tabmates.server.groups.infra.database.entities.GroupEntity
+import de.tabmates.server.groups.infra.database.entities.GroupParticipantEntity
+import de.tabmates.server.groups.infra.database.entities.UserTypeDatabase
 import de.tabmates.server.groups.infra.database.mappers.toGroup
 import de.tabmates.server.groups.infra.database.mappers.toTabEntry
 import de.tabmates.server.groups.infra.database.repositories.GroupParticipantRepository
@@ -26,6 +28,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.util.UUID
 
 @Service
 class GroupService(
@@ -122,6 +125,39 @@ class GroupService(
         )
 
         return updatedGroup
+    }
+
+    @Transactional
+    fun addNewParticipantsToGroup(
+        requestedUserId: UserId,
+        groupId: GroupId,
+        usernames: Set<String>,
+    ): Group {
+        val group =
+            groupRepository.findByIdOrNull(groupId)
+                ?: throw GroupNotFoundException()
+
+        val isRequestingUserParticipantInGroup = group.participants.any { it.userId == requestedUserId }
+        if (!isRequestingUserParticipantInGroup) {
+            throw ForbiddenException()
+        }
+
+        val newUsers =
+            usernames.map { username ->
+                GroupParticipantEntity(
+                    userId = UUID.randomUUID(),
+                    username = username,
+                    email = null,
+                    userType = UserTypeDatabase.PLACEHOLDER,
+                )
+            }
+        groupParticipantRepository.saveAll(newUsers)
+
+        return addParticipantsToGroup(
+            requestedUserId = requestedUserId,
+            groupId = groupId,
+            userIds = newUsers.map { it.userId }.toSet(),
+        )
     }
 
     @Transactional

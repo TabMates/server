@@ -14,6 +14,7 @@ import java.time.Instant
 enum class UserTypeDatabase {
     REGISTERED,
     ANONYMOUS,
+    PLACEHOLDER,
 }
 
 @Entity

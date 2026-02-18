@@ -5,6 +5,7 @@ import de.tabmates.server.common.domain.type.UserId
 enum class UserType {
     REGISTERED,
     ANONYMOUS,
+    PLACEHOLDER,
 }
 
 data class GroupParticipant(

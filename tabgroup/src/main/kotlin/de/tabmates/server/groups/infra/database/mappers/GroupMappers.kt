@@ -111,6 +111,7 @@ fun UserTypeDatabase.toUserType(): UserType {
     return when (this) {
         UserTypeDatabase.REGISTERED -> UserType.REGISTERED
         UserTypeDatabase.ANONYMOUS -> UserType.ANONYMOUS
+        UserTypeDatabase.PLACEHOLDER -> UserType.PLACEHOLDER
     }
 }
 
@@ -118,6 +119,7 @@ fun UserType.toUserTypeDatabase(): UserTypeDatabase {
     return when (this) {
         UserType.REGISTERED -> UserTypeDatabase.REGISTERED
         UserType.ANONYMOUS -> UserTypeDatabase.ANONYMOUS
+        UserType.PLACEHOLDER -> UserTypeDatabase.PLACEHOLDER
     }
 }
 
