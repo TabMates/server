@@ -11,7 +11,7 @@ ktlint = "14.0.1"
 ktlint-version = "1.8.0"
 mockito-kotlin = "6.2.3"
 mockk = "1.14.9"
-spring-boot = "4.0.2"
+spring-boot = "4.0.3"
 spring-dependency-management = "1.1.7"
 springmockk = "5.0.1"
 
