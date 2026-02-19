@@ -36,7 +36,7 @@ COPY user/src user/src
 RUN ./gradlew :app:bootJar --no-daemon -x test
 
 # Stage 2: Runtime stage
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21.0.10_7-jre-alpine
 
 # Install required packages for better security, debugging, and health checks
 RUN apk add --no-cache \
