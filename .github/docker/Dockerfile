@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Spring Boot Kotlin application
 
 # Stage 1: Build stage
-FROM gradle:8.14-jdk21 AS build
+FROM gradle:9.3-jdk21 AS build
 
 # Set working directory
 WORKDIR /app
